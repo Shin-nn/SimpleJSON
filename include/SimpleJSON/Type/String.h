@@ -16,6 +16,10 @@ namespace SimpleJSON {
 				inline String(const std::string &string_=""): string(string_) {
 				}
 
+				inline String(std::string &&string_=""): string() {
+					std::swap(string,string_);
+				}
+
 				inline String(const Number &number): string(std::to_string(number)) {
 				}
 

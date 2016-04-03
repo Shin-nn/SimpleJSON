@@ -17,7 +17,9 @@ namespace SimpleJSON {
 	class Value {
 		public:
 			~Value()  {
-				delete value;
+				if(value !=nullptr) {
+					delete value;
+				}
 			}
 
 			Value() : value (new Type::Null()) {

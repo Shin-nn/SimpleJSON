@@ -50,8 +50,8 @@ namespace SimpleJSON {
 			}
 
 			static std::unique_ptr<T> deserialize(const std::string &str) {
-				std::unique_ptr<SimpleJSON::Value> v = SimpleJSON::parse(str);
-				return instance().deserialize_(v.get());
+				SimpleJSON::Value v = SimpleJSON::parse(str);
+				return instance().deserialize_(v.as<Type::Object>());
 			}
 
 			static std::unique_ptr<T> deserialize(const SimpleJSON::Type::Object& object) {
@@ -91,7 +91,7 @@ bool SimpleJSON::Factory<T>::registerCreator_(const std::string &className, Crea
 
 template<typename T>
 std::unique_ptr<T> SimpleJSON::Factory<T>::deserialize_(const SimpleJSON::Type::Object& object) {
-	std::string className =object["class"];
+	std::string className = "A";//object["class"].as<std::string>();
 
 	const auto& creator=creators.find(className);
 	if(creator == creators.end()) {

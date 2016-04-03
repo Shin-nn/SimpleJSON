@@ -3,6 +3,7 @@
 #include <SimpleJSON.h>
 
 #include <sstream>
+#include <string>
 
 namespace SimpleJSON {
 	class SerializableObject {
@@ -17,8 +18,8 @@ namespace SimpleJSON {
 	};
 
 	inline static std::ostream& operator<<(std::ostream& stream, const SerializableObject &object) {
-		//const SimpleJSON::Type::Object obj=object.serialize();
-		//stream << obj.serialize();
+		const SimpleJSON::Type::Object obj=object.serialize();
+		stream << obj.serialize();
 
 		return stream;
 	}

@@ -42,9 +42,16 @@ namespace SimpleJSON {
 					return array[index];
 				}
 
+				std::size_t size() const {
+					return array.size();
+				}
 			private:
 				std::vector<SimpleJSON::Value> array;
 		};
+	}
 
+	template<>
+	std::unique_ptr<Type::Type> Value::toValue<std::vector<Value>>(const std::vector<Value> &r) {
+		return std::unique_ptr<Type::Array>(new Type::Array(r));
 	}
 }
