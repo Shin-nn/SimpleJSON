@@ -59,7 +59,7 @@ namespace SimpleJSON {
 	}
 
 	template<>
-	std::unique_ptr<Type::Type> Value::toValue<std::string>(const std::string &r) {
+	inline std::unique_ptr<Type::Type> Value::toValue<std::string>(const std::string &r) {
 		return std::unique_ptr<Type::String>(new Type::String(r));
 	}
 
@@ -70,7 +70,7 @@ namespace SimpleJSON {
 	}
 */
 	template<>
-	std::string& Value::as<std::string>() {
+	inline std::string& Value::as<std::string>() {
 		return *dynamic_cast<Type::String*>(value);
 	}
 }

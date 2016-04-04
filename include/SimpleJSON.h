@@ -42,24 +42,24 @@ namespace SimpleJSON {
 				}
 			}
 
-			static SimpleJSON::Type::Object parseObject(std::string& str);
+			inline static SimpleJSON::Type::Object parseObject(std::string& str);
 
-			static SimpleJSON::Type::Array parseArray(std::string& str);
+			inline static SimpleJSON::Type::Array parseArray(std::string& str);
 
-			static SimpleJSON::Type::String parseString(std::string& str);
+			inline static SimpleJSON::Type::String parseString(std::string& str);
 
-			static SimpleJSON::Type::Number parseNumber(std::string& str);
+			inline static SimpleJSON::Type::Number parseNumber(std::string& str);
 
-			static SimpleJSON::Type::Null parseNull(std::string& str);
+			inline static SimpleJSON::Type::Null parseNull(std::string& str);
 
-			static SimpleJSON::Type::Boolean parseBool(std::string& str);
+			inline static SimpleJSON::Type::Boolean parseBool(std::string& str);
 
-			static Value parseValue(std::string& str);
+			inline static Value parseValue(std::string& str);
 
-			static SimpleJSON::Type::Integer parseInteger(std::string &str);
+			inline static SimpleJSON::Type::Integer parseInteger(std::string &str);
 	};
 
-	Value parse(const std::string &str) {
+	inline Value parse(const std::string &str) {
 		return std::move(JSONParser::parse(str));
 	}
 

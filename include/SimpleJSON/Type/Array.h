@@ -51,7 +51,12 @@ namespace SimpleJSON {
 	}
 
 	template<>
-	std::unique_ptr<Type::Type> Value::toValue<std::vector<Value>>(const std::vector<Value> &r) {
+	inline std::unique_ptr<Type::Type> Value::toValue<std::vector<Value>>(const std::vector<Value> &r) {
+		return std::unique_ptr<Type::Array>(new Type::Array(r));
+	}
+	//TODO: quickfix, ifnd better solution
+	template<>
+	inline std::unique_ptr<Type::Type> Value::toValue<std::vector<float>>(const std::vector<float> &r) {
 		return std::unique_ptr<Type::Array>(new Type::Array(r));
 	}
 }

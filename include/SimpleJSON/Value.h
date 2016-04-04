@@ -59,7 +59,7 @@ namespace SimpleJSON {
 
 			template<typename T, typename std::enable_if<std::is_same<char[std::extent<T>::value],T>::value>::type* = nullptr>
 			Value(const T& r) : value (toValue<std::string>(r).release()) {
-			};
+			}
 
 			template <typename T,
 				typename std::enable_if<
@@ -84,7 +84,7 @@ namespace SimpleJSON {
 			template <typename T,typename std::enable_if<std::is_base_of<Type::Type, T>::value>::type* = nullptr>
 			T& as() {
 				return *dynamic_cast<T*>(value);
-			};
+			}
 
 			template <typename T,typename std::enable_if<!std::is_base_of<Type::Type, T>::value>::type* = nullptr>
 			T& as();
@@ -97,27 +97,27 @@ namespace SimpleJSON {
 			template <typename T, typename std::enable_if<!std::is_base_of<Type::Type, T>::value>::type* = nullptr>
 			bool operator==(const T&r) const {
 				return as<T>() == r;
-			};
+			}
 
 			template <typename T>
 			operator const T&() const {
 				return as<T>();
-			};
+			}
 
 			template <typename T>
 			operator T&() {
 				return as<T>();
-			};
+			}
 
 			template <typename T, typename std::enable_if<std::is_base_of<Type::Type, T>::value>::type* = nullptr>
 			bool operator==(const T&r) const {
 				return *dynamic_cast<T*>(value) == r;
-			};
+			}
 
 			template <typename T, typename std::enable_if<std::is_base_of<Type::Type, T>::value>::type* = nullptr>
 			bool is() const {
 				return dynamic_cast<T*>(value) != nullptr? true:false;
-			};
+			}
 
 			std::string serialize(const std::string& prefix="") const {
 				return value->serialize(prefix);

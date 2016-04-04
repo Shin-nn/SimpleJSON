@@ -35,12 +35,17 @@ namespace SimpleJSON {
 	}
 
 	template<>
-	std::unique_ptr<Type::Type> Value::toValue< >(const int &r) {
+	inline std::unique_ptr<Type::Type> Value::toValue< >(const int &r) {
+		return std::unique_ptr<Type::Integer>(new Type::Integer(r));
+	}
+
+	template<>
+	inline std::unique_ptr<Type::Type> Value::toValue< >(const unsigned long &r) {
 		return std::unique_ptr<Type::Integer>(new Type::Integer(r));
 	}
 
 	template <>
-	int& Value::as<int>() {
+	inline int& Value::as<int>() {
 		return *dynamic_cast<Type::Integer*>(value);
 	}
 

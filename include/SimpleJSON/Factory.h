@@ -91,7 +91,7 @@ bool SimpleJSON::Factory<T>::registerCreator_(const std::string &className, Crea
 
 template<typename T>
 std::unique_ptr<T> SimpleJSON::Factory<T>::deserialize_(const SimpleJSON::Type::Object& object) {
-	std::string className = "A";//object["class"].as<std::string>();
+	std::string className = object["class"].as<std::string>();
 
 	const auto& creator=creators.find(className);
 	if(creator == creators.end()) {
