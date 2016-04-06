@@ -25,7 +25,10 @@ namespace SimpleJSON {
 				inline virtual std::string serialize(const std::string& prefix="") const override {
 					std::string serialized="";
 					for(std::size_t i=0;i<array.size();i++) {
-						serialized+=(serialized.length() > 0? ", \"" : "\"")+ std::to_string(i) + "\" : " +array[i].serialize();
+						if(serialized.length() > 0) {
+							serialized+=", ";
+						}
+						serialized+=array[i].serialize();
 					}
 					return prefix+"["+serialized+"]";
 				}
@@ -44,6 +47,22 @@ namespace SimpleJSON {
 
 				std::size_t size() const {
 					return array.size();
+				}
+
+				auto begin() {
+					return array.begin();
+				}
+
+				auto end() {
+					return array.end();
+				}
+
+				auto begin() const {
+					return array.begin();
+				}
+
+				auto end() const {
+					return array.end();
 				}
 			private:
 				std::vector<SimpleJSON::Value> array;
