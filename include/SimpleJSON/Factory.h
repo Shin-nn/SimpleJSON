@@ -6,6 +6,10 @@
 #include <functional>
 #include <iostream>
 
+#define SIMPLEJSON_REGISTER(FACTORY,NAME,FUNCTION) private: static const bool __SIMPLE_JSON_REGISTERED;
+
+#define SIMPLEJSON_REGISTER_FINISH(FACTORY,NAME,FUNCTION) const bool NAME::__SIMPLE_JSON_REGISTERED = FACTORY::registerCreator( #NAME ,FUNCTION);
+
 namespace SimpleJSON {
 
 	template <typename T>
