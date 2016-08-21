@@ -12,7 +12,7 @@
 
 namespace SimpleJSON {
 
-	template <typename T>
+	template <typename T, bool DEBUG = false>
 	/**
 	 * @brief Factory for creating objects
 	 */
@@ -63,8 +63,8 @@ namespace SimpleJSON {
 			}
 
 			// Thread safe as of C++11
-			static Factory<T>& instance() {
-				static Factory<T> fact;
+			static Factory<T,DEBUG>& instance() {
+				static Factory<T,DEBUG> fact;
 				return fact;
 			}
 
@@ -82,20 +82,28 @@ namespace SimpleJSON {
 	};
 }
 
-template<typename T>
-bool SimpleJSON::Factory<T>::registerCreator_(const std::string &className, CreatorFunction f) {
+template<typename T, bool DEBUG>
+bool SimpleJSON::Factory<T,DEBUG>::registerCreator_(const std::string &className, CreatorFunction f) {
 	const auto& creator=creators.find(className);
 	if(creator != creators.end()) {
 		throw Redefined(className);
+	}
+
+	if(DEBUG) {
+		std::cerr << "REGISTERED " << className << "\n";
 	}
 
 	creators[className] = f;
 	return true;
 }
 
-template<typename T>
-std::unique_ptr<T> SimpleJSON::Factory<T>::deserialize_(const SimpleJSON::Type::Object& object) {
+template<typename T, bool DEBUG>
+std::unique_ptr<T> SimpleJSON::Factory<T,DEBUG>::deserialize_(const SimpleJSON::Type::Object& object) {
 	std::string className = object["class"].as<std::string>();
+
+	if(DEBUG) {
+		std::cerr << "DESERIALIZING " << className << "\n";
+	}
 
 	const auto& creator=creators.find(className);
 	if(creator == creators.end()) {
