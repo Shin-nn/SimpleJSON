@@ -10,7 +10,6 @@ set(SimpleJSON_INCLUDE_DIRS
 	${PROJECT_SOURCE_DIR}/include
 	CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
 
-if(ENABLE_TESTS)
 	add_subdirectory(lib/gtest)
 
 	enable_testing()
@@ -39,4 +38,7 @@ if(ENABLE_TESTS)
 	target_link_libraries(value gtest gtest_main)
 	add_test(value value)
 
-endif(ENABLE_TESTS)
+	add_executable(perf tests/perf.cpp)
+	target_link_libraries(perf gtest gtest_main)
+	add_test(perf perf)
+

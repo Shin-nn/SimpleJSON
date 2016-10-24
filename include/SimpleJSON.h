@@ -14,13 +14,45 @@
 namespace SimpleJSON {
 	class JSONParser {
 		public:
-
 			static Value parse(const std::string& str) {
-				std::string tmp =str;
-				return std::move(parseValue(tmp));
+				FastString s(str);
+				return std::move(parseValue(s));
 			}
-		public:
-			static bool isFloat(const std::string &s) {
+		private:
+			class FastString {
+				public:
+					FastString(const std::string&s) : str(s) {
+
+					}
+
+					FastString (const FastString&) = delete;
+					void operator=(const FastString&) = delete;
+
+					auto operator[](std::size_t ind) const {
+						return str[ind + baseIndex];
+					}
+
+					auto length() const {
+						return str.length()-baseIndex;
+					}
+
+					void shift(std::size_t ind) {
+						baseIndex+=ind;
+					}
+
+					auto substr(std::size_t from, std::size_t length) const {
+						return str.substr(baseIndex+from,length);
+					}
+
+					auto c_str() const {
+						return str.c_str()+baseIndex;
+					}
+				private:
+					const std::string &str;
+					std::size_t baseIndex = 0;
+			};
+
+			static bool isFloat(const FastString &s) {
 				std::size_t i =0;
 				while(1) {
 					if(std::isdigit(s[i]) || s[i]=='-') {
@@ -32,54 +64,54 @@ namespace SimpleJSON {
 					}
 				}
 			}
-			static void removeWhiteSpaces(std::string&str) {
+			static void removeWhiteSpaces(FastString& str) {
 				std::size_t ind =0;
 				while(std::isspace(str[ind])) {
 					ind++;
 				}
 				if(ind > 0) {
-					str=std::string(str.begin()+ind,str.end());
+					str.shift(ind);
 				}
 			}
 
-			inline static SimpleJSON::Type::Object parseObject(std::string& str);
+			inline static SimpleJSON::Type::Object parseObject(FastString& str);
 
-			inline static SimpleJSON::Type::Array parseArray(std::string& str);
+			inline static SimpleJSON::Type::Array parseArray(FastString& str);
 
-			inline static SimpleJSON::Type::String parseString(std::string& str);
+			inline static SimpleJSON::Type::String parseString(FastString& str);
 
-			inline static SimpleJSON::Type::Number parseNumber(std::string& str);
+			inline static SimpleJSON::Type::Number parseNumber(FastString& str);
 
-			inline static SimpleJSON::Type::Null parseNull(std::string& str);
+			inline static SimpleJSON::Type::Null parseNull(FastString& str);
 
-			inline static SimpleJSON::Type::Boolean parseBool(std::string& str);
+			inline static SimpleJSON::Type::Boolean parseBool(FastString& str);
 
-			inline static Value parseValue(std::string& str);
+			inline static Value parseValue(FastString& str);
 
-			inline static SimpleJSON::Type::Integer parseInteger(std::string &str);
+			inline static SimpleJSON::Type::Integer parseInteger(FastString &str);
 	};
 
 	inline Value parse(const std::string &str) {
 		return std::move(JSONParser::parse(str));
 	}
 
-	SimpleJSON::Type::Object JSONParser::parseObject(std::string& str) {
+	SimpleJSON::Type::Object JSONParser::parseObject(FastString& str) {
 		Type::Object obj;
 		bool inObject=true;
 		removeWhiteSpaces(str);
-		str=std::string(str.begin()+1,str.end());
+		str.shift(1);
 		do {
 			removeWhiteSpaces(str);
 			if(str[0] == '}') {
 				inObject=false;
-				str = std::string(str.begin()+1,str.end());
+				str.shift(1);
 			}else {
 				if(str[0]==',') {
-					str=std::string(str.begin()+1,str.end());
+					str.shift(1);
 				}
 				std::string key = parseString(str);
 				removeWhiteSpaces(str);
-				str = std::string(str.begin()+1,str.end());
+				str.shift(1);
 				obj[key] = parseValue(str);
 			}
 		}
@@ -87,23 +119,23 @@ namespace SimpleJSON {
 		return std::move(obj);
 	}
 
-	SimpleJSON::Type::Array JSONParser::parseArray(std::string& str) {
+	SimpleJSON::Type::Array JSONParser::parseArray(FastString& str) {
 		std::vector<Value> array;
 		bool inArray=true;
 		do {
 			removeWhiteSpaces(str);
 			if(str[0]==']') {
-				str=std::string(str.begin()+1,str.end());
+				str.shift(1);
 				inArray=false;
 			}else {
-				str=std::string(str.begin()+1,str.end()); // jump "," and "["
+				str.shift(1);
 				array.push_back(parseValue(str));
 			}
 		}while(inArray);
 		return std::move(array);
 	}
 
-	SimpleJSON::Type::String JSONParser::parseString(std::string& str) {
+	SimpleJSON::Type::String JSONParser::parseString(FastString& str) {
 		removeWhiteSpaces(str);
 
 		std::size_t end=1;
@@ -124,68 +156,67 @@ namespace SimpleJSON {
 				tmp+=str[i];
 			}
 		}
-		str=std::string(str.begin()+end+1,str.end());
+
+		str.shift(end+1);
 		return tmp;
 	}
 
-	SimpleJSON::Type::Number JSONParser::parseNumber(std::string& str) {
+	SimpleJSON::Type::Number JSONParser::parseNumber(FastString& str) {
 		removeWhiteSpaces(str);
 		std::size_t nextChar=0;
-		double ret=std::stod(str,&nextChar);
+		//double ret=std::stod(str,&nextChar);
+		double ret = __gnu_cxx::__stoa(&std::strtod, "stod", str.c_str(), &nextChar);
 
-		str=std::string(str.begin()+nextChar,str.end());
+		str.shift(nextChar);
 		return ret;
 	}
 
-	SimpleJSON::Type::Integer JSONParser::parseInteger(std::string &str) {
+	SimpleJSON::Type::Integer JSONParser::parseInteger(FastString &str) {
 		removeWhiteSpaces(str);
 		std::size_t nextChar=0;
-		int ret=std::stoi(str,&nextChar);
-
-		str=std::string(str.begin()+nextChar,str.end());
+		//int ret=std::stoi(str,&nextChar);
+		int ret = __gnu_cxx::__stoa<long, int>(&std::strtol, "stoi", str.c_str(), &nextChar, 10);
+		str.shift(nextChar);
 		return ret;
 	}
 
-	SimpleJSON::Type::Null JSONParser::parseNull(std::string& str) {
+	SimpleJSON::Type::Null JSONParser::parseNull(FastString& str) {
 		removeWhiteSpaces(str);
-		if(str.length() >= 4) {
-			str=std::string(str.begin()+4, str.end());
-		}
+		str.shift(4);
 		return {};
 	}
 
-	SimpleJSON::Type::Boolean JSONParser::parseBool(std::string& str) {
+	SimpleJSON::Type::Boolean JSONParser::parseBool(FastString& str) {
 		removeWhiteSpaces(str);
 		if(str.length() >= 4 && str.substr(0,4) == "true") {
-				str=std::string(str.begin()+4, str.end());
-				return true;
+			str.shift(4);
+			return true;
 		} else {
-			str=std::string(str.begin()+5, str.end());
+			str.shift(5);
 			return false;
 		}
 	}
 
-	Value JSONParser::parseValue(std::string &str) {
+	Value JSONParser::parseValue(FastString &str) {
 		removeWhiteSpaces(str);
 		if(str[0] == '{') {
-			return std::move(parseObject(str));
+			return parseObject(str);
 		}else if(str[0] == '[') {
-			return std::move(parseArray(str));
+			return parseArray(str);
 		}else if(str[0] == '\"') {
-			return std::move(parseString(str));
+			return parseString(str);
 		}else if(std::isdigit(str[0]) || str[0]=='-' || str[0]=='.') { // TODO init
 			if(isFloat(str)) {
-				return std::move(parseNumber(str));
+				return parseNumber(str);
 			}else {
-				return std::move(parseInteger(str));
+				return parseInteger(str);
 			}
 
 		}else if( str[0]=='n') {
-			return std::move(parseNull(str));
+			return parseNull(str);
 		}else {
-			return std::move(parseBool(str));
+			return parseBool(str);
 		}
 	}
-
 
 }
